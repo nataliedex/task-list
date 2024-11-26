@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <h1>To Do List</h1>
+    <p id="total-tasks">Total Tasks: <%= tasks.length %></p>
+
+    <ul id="list-items">
+        <% tasks.forEach(task => { %>
+            <div class="task-container">
+                <li>
+                    <input 
+                        type="checkbox"
+                        data-name="<%= task.name %>"
+                    >
+                    <%= task.name %> - <%= task.date %>
+                    <i 
+                        class="fa fa-trash delete-button"
+                        data-name="<%= task.name %>"
+                    ></i>
+                </li>
+            </div>
+        <%});%>
+    </ul>
+
+    <p>Add a New Task</p>
+    <form action="/new-task" method="POST">
+        <input type="text" placeholder="add a task" name="name">
+        <button type="submit" action="POST">Submit</button>
+    </form>
+    
+
+    <script src="/main.js"></script>
+</body>
+</html>
