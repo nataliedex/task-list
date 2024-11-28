@@ -31,14 +31,13 @@ MongoClient.connect(connectionString)
     });
 
     app.post("/new-task", (req, res) => {
-
         const newTask = {
-            name: req.body.name.trim(),
+            name: req.body.todoItem,
             complete: false
         }
         console.log(newTask);
         myTasks.insertOne(newTask)
-            .then(data => {
+            .then(result => {
                 res.redirect("/");
             })
             .catch(error => {
@@ -46,10 +45,10 @@ MongoClient.connect(connectionString)
             })
     });
 
-    app.put("/new-task", async (req, res) => {
+    app.put("/markComplete", async (req, res) => {
         try {
             const filter = {
-                name: req.body.name.trim()
+                name: req.body.name
             };
             const updateResult = await myTasks.findOneAndUpdate(
                 filter,
@@ -66,10 +65,10 @@ MongoClient.connect(connectionString)
         }
     });
 
-    app.delete("/new-task", (req, res) => {
+    app.delete("/delete", (req, res) => {
         try {
             console.log(req.body);
-            const name = req.body.name;
+            const name = req.body.itemFromJS;
 
             if(!name){
                 console.error("Missing name in the request body");
