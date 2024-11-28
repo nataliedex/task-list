@@ -1,18 +1,17 @@
 document.querySelectorAll(".delete-button").forEach((button) => {
     button.addEventListener("click", () => {
         const name = button.getAttribute("data-name");
-        const date = button.getAttribute("data-date");
 
-        if(!name || !date){
-            console.error("Missing name or date in the data attributes");
-            alert("could not find the task name or date");
+        if(!name){
+            console.error("Missing name in the data attributes");
+            alert("could not find the task name");
             return;
         }
 
-        fetch("/new-taks", {
+        fetch("/new-task", {
             method: "DELETE", 
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({name, date})
+            body: JSON.stringify({name})
         })
         .then((res) => {
             if(!res.ok){
@@ -33,4 +32,33 @@ document.querySelectorAll(".delete-button").forEach((button) => {
         });
     });
 });
+
+document.querySelectorAll(".task-checkbox").forEach((box) => {
+    box.addEventListener("change", async () => {
+        const name = box.dataset.name;
+        
+        try {
+            const response = await fetch("/new-task", {
+                method: "PUT",
+                header: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, complete }),
+            });
+
+            if(!response.ok) {
+                const errorDetails = await response.text();
+                console.error(`Error ${response.status}: ${response.statusText}`, errorDetails );
+                throw new Error(`Failed to update: ${response.status}`);
+            }
+            const data = await response.json();
+
+            const completeElement = box.closet(".task-container").querySelector(".task-checkbox");
+                if(completeElement){
+                    completeElement.classList.add("completed");
+                }
+        } catch (error) {
+            console.error("update error:", error);
+        }
+    });
+});
+
 

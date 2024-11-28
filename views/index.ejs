@@ -14,15 +14,12 @@
         <% tasks.forEach(task => { %>
             <div class="task-container">
                 <li>
-                    <input 
-                        type="checkbox"
-                        data-name="<%= task.name %>"
-                    >
-                    <%= task.name %> - <%= task.date %>
-                    <i 
-                        class="fa fa-trash delete-button"
-                        data-name="<%= task.name %>"
-                    ></i>
+                    <% if(task.complete === true) {%>
+                        <span class="complete"><%= task.name %></span>
+                        <% }else{ %>
+                        <span class="incomplete"><%= task.name %></span>
+                        <% } %>
+                    <i class="fa fa-trash delete-button" data-name="<%= task.name %>" ></i>
                 </li>
             </div>
         <%});%>
@@ -33,7 +30,7 @@
         <input type="text" placeholder="add a task" name="name">
         <button type="submit" action="POST">Submit</button>
     </form>
-    
+
 
     <script src="/main.js"></script>
 </body>

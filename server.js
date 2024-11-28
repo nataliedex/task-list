@@ -21,26 +21,24 @@ MongoClient.connect(connectionString)
 
     app.get("/", (req, res) => {
         myTasks.find().toArray()
-            .then(results => {
-                res.render("index.ejs", {tasks: results});
-            })
-            .catch(error => {
-                console.log(error);
-                res.status(500).send("Error fetching tasks");
-            })
-        
+        .then(data => {
+            res.render("index.ejs", {tasks: data});
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).send("Error fetching tasks");
+        })  
     });
 
     app.post("/new-task", (req, res) => {
-        const date = new Intl.DateTimeFormat('en-US').format(new Date());
 
         const newTask = {
-            name: req.body.name,
-            date: date
+            name: req.body.name.trim(),
+            complete: false
         }
         console.log(newTask);
         myTasks.insertOne(newTask)
-            .then(result => {
+            .then(data => {
                 res.redirect("/");
             })
             .catch(error => {
@@ -48,24 +46,45 @@ MongoClient.connect(connectionString)
             })
     });
 
-    app.delete("/new-taks", (req, res) => {
+    app.put("/new-task", async (req, res) => {
         try {
-            const { name, date } = req.body;
+            const filter = {
+                name: req.body.name.trim()
+            };
+            const updateResult = await myTasks.findOneAndUpdate(
+                filter,
+                { $set: { complete: true}}
+            );
+            if (!updateResult) {
+                console.error("update fail, no document returned");
+                return res.status(404).json({error: "task not found"});
+            }
+            res.json(updateResult);
+        } catch (error) {
+            console.error("Error during update operation: ", error);
+            res.status(500).json({ error: "An error occured during the update"});
+        }
+    });
 
-            if(!name || !date){
-                console.error("Missing name or date in the request body");
-                return res.status(400).json( {error: "Name and date are missing"});
+    app.delete("/new-task", (req, res) => {
+        try {
+            console.log(req.body);
+            const name = req.body.name;
+
+            if(!name){
+                console.error("Missing name in the request body");
+                return res.status(400).json( {error: "Name is missing"});
             }
 
-            const result = myTasks.deleteOne({ name: name.trim(), date: date});
+            const result = myTasks.deleteOne({ name: name.trim() });
 
             if(result.deleteCount === 0){
-                console.error(`No task found for name: ${name}, ${date}`);
+                console.error(`No task found for name: ${name}`);
                 return res.status(404).json({error: "task not found"});
             }
 
-            console.log(`Deleted task: ${name}, ${date}`);
-            res.json({ message: `deleted ${name}, ${date}`});
+            console.log(`Deleted task: ${name}`);
+            res.json({ message: `deleted ${name}`});
         } catch (error) {
             console.error("Error while deleting task: ", error);
             res.status(500).json( {error: "An error occured while deleting task"});
