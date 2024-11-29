@@ -22,7 +22,8 @@ MongoClient.connect(connectionString)
     app.get("/", (req, res) => {
         myTasks.find().toArray()
         .then(data => {
-            res.render("index.ejs", {tasks: data});
+            const uncompletedTasks = data.filter(task => !task.complete).length;
+            res.render("index.ejs", {tasks: data, uncompletedTasks});
         })
         .catch(error => {
             console.log(error);
@@ -48,11 +49,31 @@ MongoClient.connect(connectionString)
     app.put("/markComplete", async (req, res) => {
         try {
             const filter = {
-                name: req.body.name
+                name: req.body.itemFromJS
             };
-            const updateResult = await myTasks.findOneAndUpdate(
+            const updateResult = await myTasks.updateOne(
                 filter,
                 { $set: { complete: true}}
+            );
+            if (!updateResult) {
+                console.error("update fail, no document returned");
+                return res.status(404).json({error: "task not found"});
+            }
+            res.json(updateResult);
+        } catch (error) {
+            console.error("Error during update operation: ", error);
+            res.status(500).json({ error: "An error occured during the update"});
+        }
+    });
+
+    app.put("/markUnComplete", async (req, res) => {
+        try {
+            const filter = {
+                name: req.body.itemFromJS
+            };
+            const updateResult = await myTasks.updateOne(
+                filter,
+                { $set: { complete: false}}
             );
             if (!updateResult) {
                 console.error("update fail, no document returned");

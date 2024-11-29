@@ -1,0 +1,15 @@
+h1{
+    color: red;
+}
+.complete{
+    color: gray;
+    text-decoration: line-through;
+}
+
+span {
+    cursor: pointer;
+}
+
+.delete-button {
+    cursor: pointer;
+}

@@ -1,6 +1,6 @@
 const deleteButton = document.querySelectorAll(".delete-button");
 const item = document.querySelectorAll(".task-item span");
-const itemCompleted = document.querySelectorAll(".task-item span.completed");
+const itemCompleted = document.querySelectorAll(".task-item span.complete");
 
 Array.from(deleteButton).forEach((element) => {
     element.addEventListener("click", deleteItem);
@@ -15,7 +15,7 @@ Array.from(itemCompleted).forEach((element) => {
 });
 
 async function deleteItem(){
-    const itemText = this.parentNode.childNodes[1].innerText
+    const itemText = this.parentNode.childNodes[1].innerText;
     try{
         const response = await fetch("/delete", {
             method: "DELETE",
@@ -23,22 +23,52 @@ async function deleteItem(){
             body: JSON.stringify({
               'itemFromJS': itemText
             })
-          })
-        const data = await response.json()
-        console.log(data)
-        location.reload()
+          });
+        const data = await response.json();
+        console.log(data);
+        location.reload();
 
     }catch(err){
-        console.log(err)
+        console.log(err);
     }
 }
 
 async function markComplete(){
+    const itemText = this.parentNode.childNodes[1].innerText;
+    try{
+        const response = await fetch("/markComplete", {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              'itemFromJS': itemText
+            })
+          });
+        const data = await response.json();
+        console.log(data);
+        location.reload();
 
+    }catch(err){
+        console.log(err);
+    }
 }
 
 async function markUnComplete(){
+    const itemText = this.parentNode.childNodes[1].innerText;
+    try{
+        const response = await fetch("/markUnComplete", {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              'itemFromJS': itemText
+            })
+          });
+        const data = await response.json();
+        console.log(data);
+        location.reload();
 
+    }catch(err){
+        console.log(err);
+    }
 }
 
 
